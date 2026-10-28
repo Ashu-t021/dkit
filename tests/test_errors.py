@@ -44,7 +44,7 @@ def test_cli_errors_look_up_http_error_code(cli) -> None:
     assert result.json["code"] == "5xx"
 
 
-def test_cli_errors_search_is_case_sensitive(cli) -> None:
+def test_cli_errors_search_is_case_insensitive(cli) -> None:
     result = cli("--json", "errors", "--search", "permissions")
     assert result.exit_code == 0
     payload = result.json
@@ -52,11 +52,12 @@ def test_cli_errors_search_is_case_sensitive(cli) -> None:
     assert payload["query"] == "permissions"
     assert payload["count"] == len(payload["error_codes"])
     assert payload["count"] > 0
-    assert all("permissions" in entry["description"] for entry in payload["error_codes"])
+    assert all("permissions" in entry["description"].casefold() for entry in payload["error_codes"])
 
     uppercase = cli("--json", "errors", "--search", "Permissions")
     assert uppercase.exit_code == 0
-    assert uppercase.json["count"] == 0
+    assert uppercase.json["count"] == payload["count"]
+    assert uppercase.json["error_codes"] == payload["error_codes"]
 
 
 def test_cli_errors_search_matches_type(cli) -> None:
