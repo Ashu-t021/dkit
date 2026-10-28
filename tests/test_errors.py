@@ -100,3 +100,20 @@ def test_cli_errors_unknown_code(cli) -> None:
     assert result.exit_code == 2
     assert "unknown Discord error code" in result.stderr
     assert "run 'dkit errors'" in result.stderr
+
+
+def test_cli_errors_search_ignores_case_in_every_field(cli) -> None:
+    # description: "Missing access" is stored with a capital M
+    missing = cli("--json", "errors", "--search", "missing").json
+    assert "50001" in [entry["code"] for entry in missing["error_codes"]]
+
+    # type: stored in lower case, and 404 does not contain "http" in its text
+    http = cli("--json", "errors", "--search", "HTTP").json
+    assert "404" in [entry["code"] for entry in http["error_codes"]]
+
+    # code: stored as "5xx"
+    five = cli("--json", "errors", "--search", "5XX").json
+    assert "5xx" in [entry["code"] for entry in five["error_codes"]]
+
+    # the query is echoed as typed
+    assert five["query"] == "5XX"

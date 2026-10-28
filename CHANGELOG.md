@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (#71).
 
 ### Changed
-- Make `dkit errors --search` case-insensitive (#73)  
+
+- Make `dkit errors --search` case-insensitive (#73).
 
 ## [0.3.0] - 2026-10-28
 
